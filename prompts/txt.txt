@@ -1,0 +1,44 @@
+Why doesnt my bringup start slam mapping on launch?
+Read bringup.launch.py
+Looking at the launch file, SLAM is included in the LaunchDescription at line 108, so the node should be starting. The issue is likely one of a few things:
+
+1. use_sim_time is not forwarded to the SLAM launch (bringup.launch.py:75-77)
+
+Only sync is passed — use_sim_time is dropped. If the SLAM node's clock doesn't match the rest of the system, it can appear stuck or produce no output:
+
+
+launch_arguments={
+    'sync': sync,
+    'use_sim_time': use_sim_time,  # <-- missing
+}.items(),
+2. slam_params is declared but never forwarded (bringup.launch.py:42-46)
+
+The slam_params arg is accepted but the LaunchConfiguration('slam_params') value is never passed into slam_launch, so any custom YAML you provide is silently ignored.
+
+3. Runtime failure — if the turtlebot4_navigation package isn't found, or the lidar/tf tree isn't ready, SLAM will crash at startup. Check with:
+
+
+ros2 launch turtlebot4_reactive_controller bringup.launch.py 2>&1 | grep -i "slam\|error\|warn"
+Quick fix — update the slam_launch arguments:
+
+
+slam_params = LaunchConfiguration('slam_params')  # add this near line 54
+
+slam_launch = IncludeLaunchDescription(
+    PythonLaunchDescriptionSource(
+        PathJoinSubstitution([
+            FindPackageShare('turtlebot4_navigation'),
+            'launch',
+            'slam.launch.py',
+        ])
+    ),
+    launch_arguments={
+        'sync': sync,
+        'use_sim_time': use_sim_time,
+        'params': slam_params,        # check what arg name slam.launch.py expects
+    }.items(),
+)
+Also add nav2_params_arg back to the return if you plan to use it, or remove it to keep things clean.
+
+Would you like me to make these edits directly?
+
