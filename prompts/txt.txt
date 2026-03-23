@@ -1,4 +1,5 @@
 Why doesnt my bringup start slam mapping on launch?
+
 Read bringup.launch.py
 Looking at the launch file, SLAM is included in the LaunchDescription at line 108, so the node should be starting. The issue is likely one of a few things:
 
@@ -39,6 +40,3 @@ slam_launch = IncludeLaunchDescription(
     }.items(),
 )
 Also add nav2_params_arg back to the return if you plan to use it, or remove it to keep things clean.
-
-Would you like me to make these edits directly?
-

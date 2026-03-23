@@ -6,7 +6,7 @@ Launches three components:
   2. SLAM Toolbox          - online async mapping (best for RPi4)
   3. Nav2 stack            - full navigation (costmaps, planner, controller, recoveries)
 
-Usage on robot over network:
+To run on robot over network:
   ros2 launch turtlebot4_reactive_controller bringup.launch.py
 
 Optional args:
@@ -19,7 +19,8 @@ Optional args:
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration
+from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
@@ -30,13 +31,13 @@ def generate_launch_description():
     use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
         default_value='false',
-        description='Use simulation clock (set true for Gazebo)',
+        description='Use simulation clock',
     )
 
     sync_arg = DeclareLaunchArgument(
         'sync',
         default_value='false',
-        description='Use synchronous SLAM (true = higher quality, more CPU)',
+        description='Use synchronous SLAM',
     )
 
     use_sim_time = LaunchConfiguration('use_sim_time')
@@ -66,7 +67,7 @@ def generate_launch_description():
         }.items(),
     )
     
-    # TODO: COMMENT
+    # == 3. Rviz2 bringup ==
     rviz_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution([
@@ -77,6 +78,7 @@ def generate_launch_description():
         ),
     )
 
+    # == 4. Return Launch Description ==
     return LaunchDescription([
         use_sim_time_arg,
         sync_arg,
