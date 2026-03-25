@@ -97,7 +97,7 @@ class ReactiveController(Node):
     def key_callback(self, msg):
         # Store the latest keyboard command and its timestamp.
         self.last_key_cmd = msg
-        self.key_time = self.get_clock().now()create_subscription
+        self.key_time = self.get_clock().now()
 
     def odom_callback(self, msg):
         # Accumulate distance traveled and track current yaw.
